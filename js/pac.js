@@ -54,19 +54,19 @@ var PAC_utils = (function PAC_utils(undefined){
 var submitButton = document.getElementById('submit_button');
 
 	submitButton.addEventListener('click', function() {
-		var options = []; 
+		var options = {}; 
 
 		$.each(PAC_utils.URLToArray(), function(key){
 			var input = document.getElementById(key);
 			
 			if (key.indexOf('color') !== -1) {
-			options[key] = parseInt(input.value.replace("#",""), 16)
-		} else if(key.indexOf('bool') !== -1) {
-			options[key] = input.checked ? 1 : 0;
-		} else if (key.indexOf('option') !== -1){
-			options[key] = $('input[name="' + key + '"]:checked').val();;
-		}
-	});
+				options[key] = parseInt(input.value.replace("#",""), 16)
+			} else if(key.indexOf('bool') !== -1) {
+				options[key] = input.checked ? 1 : 0;
+			} else if (key.indexOf('option') !== -1){
+				options[key] = $('input[name="' + key + '"]:checked').val();;
+			}
+		});
 		console.log(options);
     
     var return_to = PAC_utils.getQueryParam('return_to', 'pebblejs://close#');
