@@ -1,6 +1,8 @@
 #Pebble Auto Configuration
 PAC is a simple configuration page for pebble watchface configuration.PAC uses url parameters to create a config page on the fly using JS.
 
+[URL Example](http://gjthoman.github.io/pebble_auto_config/?title=corridor_configuration&battery_visibility_option=always_show__@never_show__show_on_shake&background_color=0&hour_color=65280&minute_color=65280&animate_seconds_bool=1)
+
 ##Configuration Options
 Currently, PAC accepts 3 field types (keys):
 
