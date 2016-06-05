@@ -12,25 +12,25 @@ Configuration values can't have spaces (for now), use underscores. For each conf
 
 ###Title
 
-```&title=corridor_configuration```
+`&title=corridor_configuration`
 
 ###Color
 
-```&battery_background_color=65280```
+`&battery_background_color=65280`
 
 ###Bool
 
 Bool will return a 1 or 0.
 
-```&always_show_battery_bool=1```
+`&always_show_battery_bool=1`
 
-```&always_show_battery_bool=0```
+`&always_show_battery_bool=0`
 
 ###Option
 
 Option values are deliniated by double underscore. Options are displayed and returned in the order the are set. The first value will return 0, second 1 and so on. The default value is designated by '@':
 
-```battery_options=always_show_on__@never_show_on__shake_on_shake```
+`battery_options=always_show_on__@never_show_on__shake_on_shake`
 
 ##How to use PAC with Pebble App Messaging
 
