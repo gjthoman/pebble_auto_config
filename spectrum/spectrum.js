@@ -304,7 +304,8 @@
 
             updateSelectionPaletteFromStorage();
 
-            offsetElement.bind("click.spectrum touchstart.spectrum", function (e) {
+            //offsetElement.bind("click.spectrum touchstart.spectrum", function (e) {
+            offsetElement.bind("click.spectrum", function (e) {
                 if (!disabled) {
                     toggle();
                 }
@@ -471,7 +472,8 @@
                 return false;
             }
 
-            var paletteEvent = IE ? "mousedown.spectrum" : "click.spectrum touchstart.spectrum";
+            var paletteEvent = IE ? "mousedown.spectrum" : "click.spectrum";
+            //var paletteEvent = IE ? "mousedown.spectrum" : "click.spectrum touchstart.spectrum";
             paletteContainer.delegate(".sp-thumb-el", paletteEvent, paletteElementClick);
             initialColorContainer.delegate(".sp-thumb-el:nth-child(1)", paletteEvent, { ignore: true }, paletteElementClick);
         }
@@ -1040,12 +1042,12 @@
         var offset = {};
         var maxHeight = 0;
         var maxWidth = 0;
-        var hasTouch = ('ontouchstart' in window);
+        var hasTouch = false;//('ontouchstart' in window);
 
         var duringDragEvents = {};
-        duringDragEvents["selectstart"] = prevent;
-        duringDragEvents["dragstart"] = prevent;
-        duringDragEvents["touchmove mousemove"] = move;
+        //duringDragEvents["selectstart"] = prevent;
+        //duringDragEvents["dragstart"] = prevent;
+        //duringDragEvents["touchmove mousemove"] = move;
         duringDragEvents["touchend mouseup"] = stop;
 
         function prevent(e) {
@@ -1186,7 +1188,7 @@
 
     $.fn.spectrum.load = true;
     $.fn.spectrum.loadOpts = {};
-    $.fn.spectrum.draggable = draggable;
+    //$.fn.spectrum.draggable = draggable;
     $.fn.spectrum.defaults = defaultOpts;
     $.fn.spectrum.inputTypeColorSupport = function inputTypeColorSupport() {
         if (typeof inputTypeColorSupport._cachedResult === "undefined") {
