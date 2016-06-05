@@ -110,17 +110,17 @@ $(document).ready(function(){
 		var settings = document.getElementById('settings');
 	
 		var panel = document.createElement('DIV');
-		panel.classList = 'panel panel-default';
+		panel.className += 'panel panel-default';
 
 		var heading = document.createElement('DIV');
-		heading.classList = 'panel-heading';	
+		heading.className += 'panel-heading';	
 
 		var h3 = document.createElement('H3');
-		h3.classList = 'panel-title';
+		h3.className += 'panel-title';
 		h3.textContent = PAC_utils.titleize(title);
 
 		var body = document.createElement('DIV');
-		body.classList = 'panel-body';
+		body.className += 'panel-body';
 
 		heading.appendChild(h3);
 		body.appendChild(bodyContent);
@@ -134,7 +134,7 @@ $(document).ready(function(){
 		color: function(key, value){
 			var input = document.createElement('INPUT');
 			input.id = key;
-			input.classList = 'color';
+			input.className += 'color';
 			input.type = 'text';
 			input.value = '#' + PAC_utils.numToHex(value);
 		
