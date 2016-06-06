@@ -116,10 +116,12 @@ var colors = (function colors(){
 });
 
 $(document).ready(function(){
-	$('#page_title').text(PAC_utils.titleize(PAC_utils.getURLVariable('title')));
-	
 	var urlVars = PAC_utils.URLToArray();
-	
+
+	$('#settings').html('');
+
+	$('#page_title').text(PAC_utils.titleize(urlVars['title']));
+		
 	var create = {
 		panel: function(title, bodyContent) {
 			var $settings = $('#settings');
@@ -196,7 +198,7 @@ $(document).ready(function(){
 	        
 			if (key.indexOf('color') !== -1) {
 				addInput['color'](key, value);
-				$('#'+key).spectrum(colors.options);
+				$('#'+key).spectrum(colors().options);
 			} else if(key.indexOf('bool') !== -1) {
 				addInput['bool'](key, value);
 			} else if(key.indexOf('option') !== -1) {
