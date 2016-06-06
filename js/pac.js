@@ -41,6 +41,7 @@ var PAC_utils = (function PAC_utils(undefined){
       }
       return defaultValue || false;
     }
+
 	return {
 		URLToArray: URLToArray,
 		getURLVariable: getURLVariable,
@@ -74,110 +75,118 @@ var submitButton = document.getElementById('submit_button');
     document.location = return_to + encodeURIComponent(JSON.stringify(options));
 });
 
-$(document).ready(function(){
-	var colors = [];
-	var alphaNums = ['0','5','A','F']
+var colors = (function colors(){
+	var options = {};
 	
-	document.getElementById('page_title').textContent = PAC_utils.titleize(PAC_utils.getURLVariable('title'));
-	for (var i = 0, len = alphaNums.length; i < len; i++) {
-	  var s = alphaNums[i];
-		for (var j = 0, len = alphaNums.length; j < len; j++) {
-	  		var t = alphaNums[j];
-	  		for (var k = 0, len = alphaNums.length; k < len; k++) {
-		  		var u = alphaNums[k];
+	function init(){
+		var colors = [];
+		var alphaNums = ['0','5','A','F']
+		
+		for (var i = 0, len = alphaNums.length; i < len; i++) {
+		  var s = alphaNums[i];
+			for (var j = 0, len = alphaNums.length; j < len; j++) {
+		  		var t = alphaNums[j];
+		  		for (var k = 0, len = alphaNums.length; k < len; k++) {
+			  		var u = alphaNums[k];
 
-		  		colors.push(t+s+u);
+			  		colors.push(t+s+u);
+				}
 			}
 		}
+
+		var arrays = [], size = 8;
+		arrays.push("");
+
+		while (colors.length > 0)
+		    arrays.push(colors.splice(0, size));
+
+		options = {
+		    showPaletteOnly: true,
+		    preferredFormat: "hex",
+		    hideAfterPaletteSelect:true,
+		    palette: [arrays[1],arrays[3],arrays[5],arrays[7],arrays[0],arrays[2],arrays[4],arrays[6],arrays[8]]
+		};
 	}
 
-	var arrays = [], size = 8;
-	arrays.push("");
+	init();
 
-	while (colors.length > 0)
-	    arrays.push(colors.splice(0, size));
+	return {
+		options: options
+	}
+});
 
-	var options = {
-	    showPaletteOnly: true,
-	    preferredFormat: "hex",
-	    hideAfterPaletteSelect:true,
-	    palette: [arrays[1],arrays[3],arrays[5],arrays[7],arrays[0],arrays[2],arrays[4],arrays[6],arrays[8]]
-	};
-
-	var urlVars = PAC_utils.URLToArray();
-
-	function createPanel(title, bodyContent) {
-		var settings = document.getElementById('settings');
+$(document).ready(function(){
+	$('#page_title').text(PAC_utils.titleize(PAC_utils.getURLVariable('title')));
 	
-		var panel = document.createElement('DIV');
-		panel.className += 'panel panel-default';
-
-		var heading = document.createElement('DIV');
-		heading.className += 'panel-heading';	
-
-		var h3 = document.createElement('H3');
-		h3.className += 'panel-title';
-		h3.textContent = PAC_utils.titleize(title);
-
-		var body = document.createElement('DIV');
-		body.className += 'panel-body';
-
-		heading.appendChild(h3);
-		body.appendChild(bodyContent);
-		panel.appendChild(heading);
-		panel.appendChild(body);
+	var urlVars = PAC_utils.URLToArray();
+	
+	var create = {
+		panel: function(title, bodyContent) {
+			var $settings = $('#settings');
 		
-		settings.appendChild(panel);
+			var $panel = $('<div class="panel panel-default"></div>');
+			var $heading = $('<div class="panel-heading"><h3 class="panel-title">'+ PAC_utils.titleize(title) +'</h3></div>');
+			var $body = $('<div class="panel-body"></div>');
+
+			$body.append(bodyContent);
+			$panel.append($heading).append($body);
+			
+			$settings.append($panel);
+		},
+		label: function(_for, _text) {
+			return $('<label for="'+_for+'">'+_text+'</label>');
+		},
+		input: function(data) {
+			return $('<input class="'+data.klass+'" name="'+data.name+'" id="'+data.id+'" value="'+data.value+'" type="'+data.type+'" '+data.options+'></input>');
+		}
 	}
 
 	var addInput = {
 		color: function(key, value){
-			var input = document.createElement('INPUT');
-			input.id = key;
-			input.className += 'color';
-			input.type = 'text';
-			input.value = '#' + PAC_utils.numToHex(value);
-		
-			createPanel(key, input);
+			var $input = create.input({
+				id: key,
+				klass: "color",
+				type: "text",
+				value: "#"+PAC_utils.numToHex(value)
+			});
+
+			create.panel(key, $input);
 		},
 		bool: function(key, value){
-			var checkbox = document.createElement('DIV');
+			var $checkbox = $('<div></div>');
+			var $label = create.label(key, "");
+			var $input = create.input({
+				id: key,
+				type:"checkbox",
+				options: value == 1 ? "checked=checked" : ""
+			});
+			
+			
+			$checkbox.append($input);
+			$checkbox.append($label);
 
-			var input = document.createElement('INPUT');
-			input.id = key;
-			input.type = 'checkbox';
-			input.checked = value == 1 ? true : false;
-
-			var label = document.createElement('LABEL');
-			label.htmlFor = key;
-
-			checkbox.appendChild(input);
-			checkbox.appendChild(label);
-
-			createPanel(key, checkbox);
+			create.panel(key, $checkbox);
 		},
 		option: function(key, value){
 			var options = value.split('__');
 			
-			var radios = document.createElement('DIV');
+			var $radios = $('<div></div>');
 
 			for (var i = 0, len = options.length; i < len; i++) {
-				var input = document.createElement('INPUT');
-				input.name = key;
-				input.id = options[i];
-				input.value = i;
-				input.type = 'radio';
-				input.checked = options[i].indexOf('@') !== -1 ? true : false;
+				var $label = create.label(options[i], PAC_utils.titleize(options[i]));
+				var $input = create.input({
+					name: key,
+					id: options[i],
+					value: i,
+					type: "radio",
+					options: options[i].indexOf('@') !== -1 ? "checked=checked" : ""
+				});
 
-				var label = document.createElement('LABEL');
-				label.htmlFor = options[i];
-				label.textContent = PAC_utils.titleize(options[i]);
-
-				radios.appendChild(input);
-				radios.appendChild(label);
+				$radios.append($input);
+				$radios.append($label);
 			}
 
-			createPanel(key, radios);
+			create.panel(key, $radios);
 		}
 	}
 
@@ -187,7 +196,7 @@ $(document).ready(function(){
 	        
 			if (key.indexOf('color') !== -1) {
 				addInput['color'](key, value);
-				$('#'+key).spectrum(options);
+				$('#'+key).spectrum(colors.options);
 			} else if(key.indexOf('bool') !== -1) {
 				addInput['bool'](key, value);
 			} else if(key.indexOf('option') !== -1) {
