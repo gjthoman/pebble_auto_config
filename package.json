@@ -1,0 +1,30 @@
+{
+  "name": "pebble_auto_config",
+  "version": "0.1.0",
+  "description": "PAC is a simple configuration page for pebble watchface configuration. PAC uses url parameters to create a config page on the fly using JS.",
+  "main": "index.js",
+  "scripts": {
+    "uncss": "uncss ./index.html > ./css/main.css",
+    "copy:bootstrap": "cp ./node_modules/bootstrap/dist/css/bootstrap.min.css ./css",
+    "copy:jquery": "cp ./node_modules/jquery/dist/jquery.min.js ./js",
+    "copy:all": "npm run copy:bootstrap && npm run copy:jquery"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gjthoman/pebble_auto_config.git"
+  },
+  "keywords": [
+    "pebble"
+  ],
+  "author": "Greg Thoman",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/gjthoman/pebble_auto_config/issues"
+  },
+  "homepage": "https://github.com/gjthoman/pebble_auto_config#readme",
+  "dependencies": {
+    "bootstrap": "^3.3.6",
+    "jquery": "^2.2.4",
+    "uncss": "^0.13.0"
+  }
+}
