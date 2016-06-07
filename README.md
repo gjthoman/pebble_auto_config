@@ -1,40 +1,71 @@
 #Pebble Auto Configuration
 PAC is a simple configuration page for pebble watchface configuration.PAC uses url parameters to create a config page on the fly using JS.
 
-[URL Example](http://gjthoman.github.io/pebble_auto_config/?title=corridor_configuration&battery_visibility_option=always_show__@never_show__show_on_shake&background_color=0&hour_color=65280&minute_color=65280&animate_seconds_bool=1)
+[URL Example](http://gjthoman.github.io/pebble_auto_config/?config=%5B%7B%22type%22%3A%22title%22%2C%22label%22%3A%22Corridor%20Config%22%7D%2C%7B%22type%22%3A%22option%22%2C%22key%22%3A%22batt_visibility%22%2C%22label%22%3A%22Battery%20Visibility%22%2C%22default%22%3A1%2C%22options%22%3A%5B%22Always%20Show%22%2C%22Never%20Show%22%2C%22Show%20on%20Shake%22%5D%7D%2C%7B%22type%22%3A%22text%22%2C%22key%22%3A%22pet_name%22%2C%22label%22%3A%22What%20is%20your%20pet%27s%20name%3F%22%2C%22default%22%3A%22Wicket%22%7D%2C%7B%22type%22%3A%22number%22%2C%22key%22%3A%22age%22%2C%22label%22%3A%22How%20old%20are%20you%3F%22%2C%22default%22%3A%2230%22%7D%2C%7B%22type%22%3A%22color%22%2C%22key%22%3A%22back_color%22%2C%22label%22%3A%22Background%20Color%22%2C%22default%22%3A16711680%7D%2C%7B%22type%22%3A%22color%22%2C%22key%22%3A%22hour_color%22%2C%22label%22%3A%22Hour%20Color%22%2C%22default%22%3A65280%7D%2C%7B%22type%22%3A%22bool%22%2C%22key%22%3A%22always_batt%22%2C%22label%22%3A%22Always%20Show%20Battery%22%2C%22default%22%3A1%7D%5D)
 
-##Configuration Options
-Currently, PAC accepts 3 field types (keys):
+##General
 
+Pass in a `title` param to set page title
+
+**Supported Fields**
+
+* Text
+* Number
 * Color
 * Bool
 * Option
+ 
+##JSON configuration
 
-Configuration values can't have spaces (for now), use underscores. For each configuration field, you pass in the starting value.
+* `key`: should be alpha numeric (starting with alpha) and contain no spaces
+* `type`: one of [`"title"`,`"option"`,`"color"`,`"bool"`]
+* `label`: string
+* `default`: number or string. 0 or 1 for bool. colors are 16 bit integers
 
-###Title
-
-`&title=corridor_configuration`
-
-###Color
-
-`&battery_background_color=65280`
-
-###Bool
-
-Bool will return a 1 or 0.
-
-`&always_show_battery_bool=1`
-
-`&always_show_battery_bool=0`
-
-###Option
-
-Option values are deliniated by double underscore. Options are displayed and returned in the order the are set. The first value will return 0, second 1 and so on. The default value is designated by '@':
-
-`&battery_options=always_show_on__@never_show_on__shake_on_shake`
-
-sample implementation to come later.
+```javascript
+[	
+	{
+		type: "title",
+		label: "Corridor Config"
+	},
+	{
+		type: "option",
+		key: "batt_visibility",
+		label: "Battery Visibility",
+		default: 1,
+		options: [ "Always Show", "Never Show", "Show on Shake"]
+	},
+	{
+		type: "text",
+		key: "pet_name",
+		label: "What is your pet's name?",
+		default: "Wicket"
+	},
+	{
+		type: "number",
+		key: "age",
+		label: "How old are you?",
+		default: "30"
+	},
+	{
+		type: "color",
+		key: "back_color",
+		label: "Background Color",
+		default: 16711680
+	},
+	{
+		type: "color",
+		key: "hour_color",
+		label: "Hour Color",
+		default: 65280
+	},
+	{
+		type: "bool",
+		key: "always_batt",
+		label: "Always Show Battery",
+		default: 1
+	}
+]```
 
 ##How to use PAC with Pebble App Messaging
 
@@ -49,7 +80,7 @@ AppKeyMinuteColor = 2,
 AppKeyShowBatt = 3
 ```
 
-###Full app.js example (simple):
+###Full app.js example:
 
 ```javascript
 Pebble.addEventListener('showConfiguration', function() {
@@ -58,12 +89,38 @@ Pebble.addEventListener('showConfiguration', function() {
   var min = window.localStorage.getItem('MINUTE_COLOR') ? window.localStorage.getItem('MINUTE_COLOR') : 65280;
   var show_batt = window.localStorage.getItem('SHOW_BATT') ? window.localStorage.getItem('SHOW_BATT') : 1;
   
-  var url = 'http://gjthoman.github.io/pebble_auto_config/'+
-      '?title=' + 'orbit_config' +
-      '&background_color=' + background +
-      '&hour_color=' + hour +
-      '&minute_color=' + min +
-      '&always_show_battery_bool=' + show_batt
+  var config = [  
+    {
+      type: "title",
+      label: "Orbit Config"
+    },
+    {
+      type: "color",
+      key: "back_color",
+      label: "Background Color",
+      default: background
+    },
+    {
+      type: "color",
+      key: "hour_color",
+      label: "Hour Color",
+      default: hour
+    },
+    {
+      type: "color",
+      key: "minute_color",
+      label: "Minute Color",
+      default: min
+    },
+    {
+      type: "bool",
+      key: "show_batt",
+      label: "Always Show Battery",
+      default: show_batt
+    }
+  ]
+
+var url = 'http://gjthoman.github.io/pebble_auto_config/?config=' + encodeURIComponent(JSON.stringify(config));
     
   Pebble.openURL(url);
 });
@@ -90,6 +147,7 @@ Pebble.addEventListener('webviewclosed', function(e) {
     console.log('Error sending config data!');
   });
 });
+
 ```
 
 ###Partial *.c example (simple):
