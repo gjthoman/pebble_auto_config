@@ -1,5 +1,9 @@
+/*
+file:///Users/gregthoman/workspace/pebble_auto_config/index.html?config=%5B%7B%22type%22%3A%22title%22%2C%22label%22%3A%22Corridor%20Config%22%7D%2C%7B%22type%22%3A%22option%22%2C%22key%22%3A%22batt_visibility%22%2C%22label%22%3A%22Battery%20Visibility%22%2C%22default%22%3A1%2C%22options%22%3A%5B%22Always%20Show%22%2C%22Never%20Show%22%2C%22Show%20on%20Shake%22%5D%7D%2C%7B%22type%22%3A%22color%22%2C%22key%22%3A%22back_color%22%2C%22label%22%3A%22Background%20Color%22%2C%22default%22%3A0%7D%2C%7B%22type%22%3A%22color%22%2C%22key%22%3A%22hour_color%22%2C%22label%22%3A%22Hour%20Color%22%2C%22default%22%3A65280%7D%2C%7B%22type%22%3A%22bool%22%2C%22key%22%3A%22always_batt%22%2C%22label%22%3A%22Always%20Show%20Battery%22%2C%22default%22%3A1%7D%5D
+*/
+
 var PAC_utils = (function PAC_utils(undefined){ 
-	URLToArray = function() {
+	URLToObject = function() {
 	    var request = {};
 	    var url = window.location.href;
 	    var pairs = url.substring(url.indexOf('?') + 1).split('&');
@@ -10,14 +14,6 @@ var PAC_utils = (function PAC_utils(undefined){
 	        request[decodeURIComponent(pair[0])] = decodeURIComponent(pair[1]);
 	     }
 	     return request;
-	}
-	getURLVariable = function(name)  {
-	  name = name.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
-	  var regexS = "[\\?&]"+name+"=([^&#]*)",
-	      regex = new RegExp(regexS),
-	      results = regex.exec(window.location.href);
-	  if (results == null) return "";
-	  else return results[1];
 	}
 	stripOutThings = function(str){
 		return str.replace('_color', '').replace('_bool', '').replace('_option', '').replace('@', '');
@@ -43,8 +39,7 @@ var PAC_utils = (function PAC_utils(undefined){
     }
 
 	return {
-		URLToArray: URLToArray,
-		getURLVariable: getURLVariable,
+		URLToObject: URLToObject,
 		stripOutThings: stripOutThings,
 		titleize: titleize,
 		numToHex: numToHex,
@@ -52,33 +47,12 @@ var PAC_utils = (function PAC_utils(undefined){
 	}
 })();
 
-var submitButton = document.getElementById('submit_button');
-
-	submitButton.addEventListener('click', function() {
-		var options = {}; 
-
-		$.each(PAC_utils.URLToArray(), function(key){
-			var input = document.getElementById(key);
-			
-			if (key.indexOf('color') !== -1) {
-				options[key] = parseInt(input.value.replace("#",""), 16)
-			} else if(key.indexOf('bool') !== -1) {
-				options[key] = input.checked ? 1 : 0;
-			} else if (key.indexOf('option') !== -1){
-				options[key] = $('input[name="' + key + '"]:checked').val();;
-			}
-		});
-		console.log(options);
-    
-    var return_to = PAC_utils.getQueryParam('return_to', 'pebblejs://close#');
-
-    document.location = return_to + encodeURIComponent(JSON.stringify(options));
-});
-
-var colors = (function colors(){
-	var options = {};
-	
-	function init(){
+var PAC_core = (function PAC_core(){
+	var urlVars = {};
+	var configData = [];
+	var spectrumOptions = {};
+		
+	function initSpectrumOptions(){
 		var colors = [];
 		var alphaNums = ['0','5','A','F']
 		
@@ -100,34 +74,20 @@ var colors = (function colors(){
 		while (colors.length > 0)
 		    arrays.push(colors.splice(0, size));
 
-		options = {
+		return {
 		    showPaletteOnly: true,
 		    preferredFormat: "hex",
 		    hideAfterPaletteSelect:true,
 		    palette: [arrays[1],arrays[3],arrays[5],arrays[7],arrays[0],arrays[2],arrays[4],arrays[6],arrays[8]]
 		};
 	}
-
-	init();
-
-	return {
-		options: options
-	}
-});
-
-$(document).ready(function(){
-	var urlVars = PAC_utils.URLToArray();
-
-	$('#settings').html('');
-
-	$('#page_title').text(PAC_utils.titleize(urlVars['title']));
-		
+	
 	var create = {
 		panel: function(title, bodyContent) {
 			var $settings = $('#settings');
 		
 			var $panel = $('<div class="panel panel-default"></div>');
-			var $heading = $('<div class="panel-heading"><h3 class="panel-title">'+ PAC_utils.titleize(title) +'</h3></div>');
+			var $heading = $('<div class="panel-heading"><h3 class="panel-title">'+ title +'</h3></div>');
 			var $body = $('<div class="panel-body"></div>');
 
 			$body.append(bodyContent);
@@ -143,67 +103,185 @@ $(document).ready(function(){
 		}
 	}
 
+	function checkProps(props, element) {
+		$.each(props, function(){
+	        if (element[this] == undefined){
+	        	throw "["+this + "] is a required parameter for [" + element.type +"]";
+	        }
+		});
+	}
+
+	var requiredFields = {
+		color: 	["type","key","label","default"],
+		bool: 	["type","key","label","default"],
+		option: ["type","key","label","default","options"],
+		title: 	["type", "label"]
+	}
+
 	var addInput = {
-		color: function(key, value){
+		color: function(element){
 			var $input = create.input({
-				id: key,
+				id: element.key,
 				klass: "color",
 				type: "text",
-				value: "#"+PAC_utils.numToHex(value)
+				value: "#"+PAC_utils.numToHex(element.default)
 			});
 
-			create.panel(key, $input);
+			create.panel(element.label, $input);
+			$('#'+element.key).spectrum(spectrumOptions);
 		},
-		bool: function(key, value){
+		bool: function(element){
 			var $checkbox = $('<div></div>');
-			var $label = create.label(key, "");
+			var $label = create.label(element.key, "");
 			var $input = create.input({
-				id: key,
-				type:"checkbox",
-				options: value == 1 ? "checked=checked" : ""
+				id: element.key,
+				type: "checkbox",
+				options: element.default == 1 ? "checked=checked" : ""
 			});
 			
 			
 			$checkbox.append($input);
 			$checkbox.append($label);
 
-			create.panel(key, $checkbox);
+			create.panel(element.label, $checkbox);
 		},
-		option: function(key, value){
-			var options = value.split('__');
-			
+		option: function(element){
 			var $radios = $('<div></div>');
 
-			for (var i = 0, len = options.length; i < len; i++) {
-				var $label = create.label(options[i], PAC_utils.titleize(options[i]));
+			for (var i = 0, len = element.options.length; i < len; i++) {
+				var key = element.options[i].replace(/\W+/g, "_").toLowerCase();
+				var $label = create.label(key, element.options[i]);
 				var $input = create.input({
-					name: key,
-					id: options[i],
+					name: element.key,
+					id: key,
 					value: i,
 					type: "radio",
-					options: options[i].indexOf('@') !== -1 ? "checked=checked" : ""
+					options: i == element.default ? "checked=checked" : ""
 				});
 
 				$radios.append($input);
 				$radios.append($label);
 			}
 
-			create.panel(key, $radios);
+			create.panel(element.label, $radios);
+		},
+		title: function(value) {
+			$('#page_title').text(value.label);	
 		}
 	}
 
-	for (var key in urlVars) {
-	    if (urlVars.hasOwnProperty(key)) {
-	        value = urlVars[key];
-	        
-			if (key.indexOf('color') !== -1) {
-				addInput['color'](key, value);
-				$('#'+key).spectrum(colors().options);
-			} else if(key.indexOf('bool') !== -1) {
-				addInput['bool'](key, value);
-			} else if(key.indexOf('option') !== -1) {
-				addInput['option'](key, value);
+	function init(){
+		$('#settings').html('');
+		spectrumOptions = initSpectrumOptions();
+		urlVars = PAC_utils.URLToObject();
+
+		if (!urlVars.config) {
+			for (var key in urlVars) {
+			    if (urlVars.hasOwnProperty(key)) {
+			        value = urlVars[key];
+			        
+					if (key.indexOf('color') !== -1) {
+						configData.push({
+							type: "color",
+							key: key,
+							label: PAC_utils.titleize(key),
+							default: value
+						});
+						
+						
+					} else if(key.indexOf('bool') !== -1) {
+						configData.push({
+							type: "bool",
+							key: key,
+							label: PAC_utils.titleize(key),
+							default: value
+						});
+					} else if(key.indexOf('option') !== -1) {
+						var options = [];
+						var _default = 0;
+						
+						$.each(value.split('__'), function(i){
+							if (this.indexOf('@') !== -1) {
+								_default = i;
+							}
+							options.push(PAC_utils.titleize(this));
+						});
+						
+						configData.push({
+							type: "option",
+							key: key,
+							label: PAC_utils.titleize(key),
+							default: _default,
+							options: options
+						});
+					} else if(key.indexOf('title') !== -1) {
+						configData.push({
+							type: "title",
+							label: PAC_utils.titleize(value)
+						});
+					}
+			    }
 			}
-	    }
+			
+		} else {
+			configData = JSON.parse(PAC_utils.URLToObject().config);
+		}
+
+		createElements();
+		setupListeners();
 	}
+
+	function createElements() {
+		$.each(configData, function(key, element){
+			checkProps(requiredFields[element.type],element);
+			addInput[element.type](element);
+		});
+	}
+
+	function setupListeners(){
+		$('#submit_button').on('click', function() {
+			var options = getValues(); 
+
+			console.log(options);
+
+		    var return_to = PAC_utils.getQueryParam('return_to', 'pebblejs://close#');
+
+		    document.location = return_to + encodeURIComponent(JSON.stringify(options));
+		});
+	}
+
+	var getValueById = {
+		color: function(key) {
+			var input = document.getElementById(key);
+			return parseInt(input.value.replace("#",""), 16);
+		},
+		bool: function(key) {
+			var input = document.getElementById(key);
+			return input.checked ? 1 : 0;
+		},
+		option: function(key) {
+			var input = document.getElementById(key);
+			return $('input[name="' + key + '"]:checked').val();
+		}
+	}
+
+	function getValues(){
+		var options = {};
+		$.each(configData, function(key, element){
+			if(element.key) {
+				options[element.key] = getValueById[element.type](element.key);
+			}
+		});
+
+		return options;
+	}
+
+	return {
+		init: init,
+		getValues: getValues
+	}
+});
+
+$(document).ready(function(){
+	PAC_core().init();
 });

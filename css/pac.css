@@ -63,4 +63,5 @@ input[type=checkbox]:checked + label:after {
 }
 h1 {
 	line-height: 2;
+    text-align: center;
 }
