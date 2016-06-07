@@ -65,7 +65,8 @@ Pass in a `title` param to set page title
 		label: "Always Show Battery",
 		default: 1
 	}
-]```
+]
+```
 
 ##How to use PAC with Pebble App Messaging
 
