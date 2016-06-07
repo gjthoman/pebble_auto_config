@@ -9,7 +9,7 @@
     "package:js":"npm run combine:js",
     "uncss": "uncss -t 2000 ./index.html > ./main.min.css",
     "combine:css": "cat ./css/*.css >> ./main.css",
-    "combine:js": "cat ./js/*.js >> ./main.js",
+    "combine:js": "rm ./main.js && cat ./js/*.js >> ./main.js",
     "copy:css": "cp main.min.css main.css",
     "copy:bootstrap": "cp ./node_modules/bootstrap/dist/css/bootstrap.min.css ./css",
     "copy:jquery": "cp ./node_modules/jquery/dist/jquery.min.js ./js",
