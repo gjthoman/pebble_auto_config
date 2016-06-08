@@ -49,6 +49,10 @@ input[type=checkbox] + label:after {
 input[type=checkbox]:checked + label:after {
     content: "ON";
 }
+.form-control {
+    height: 44px;
+    font-size: 18px;
+}
 .btn-primary, .btn-primary:hover, .btn-primary:focus, .btn-primary:active:focus {
     color: #fff;
     background-color: #34A7C1;
@@ -61,7 +65,10 @@ input[type=checkbox]:checked + label:after {
 	display: block;
     padding: 1em;
 }
-h1 {
-	line-height: 2;
+h1, h2 {
+    line-height: 2;
     text-align: center;
+}
+h2 {
+	font-size: 24px;
 }

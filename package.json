@@ -4,15 +4,16 @@
   "description": "PAC is a simple configuration page for pebble watchface configuration. PAC uses url parameters to create a config page on the fly using JS.",
   "main": "index.js",
   "scripts": {
-    "package":"npm run copy:all && npm run package:css && npm run package:js",
-    "package:css":"npm run combine:css && npm run uncss && npm run copy:css",
-    "package:js":"npm run combine:js",
+    "package": "npm run copy:all && npm run package:css && npm run package:js",
+    "package:css": "npm run combine:css && npm run uncss && npm run copy:css",
+    "package:js": "npm run combine:js",
     "uncss": "uncss ./index.html > ./main.min.css",
     "combine:css": "cat ./css/*.css >> ./main.css",
     "combine:js": "rm ./main.js && cat ./js/*.js >> ./main.js",
     "copy:css": "cp main.min.css main.css",
     "copy:bootstrap": "cp ./node_modules/bootstrap/dist/css/bootstrap.min.css ./css",
     "copy:jquery": "cp ./node_modules/jquery/dist/jquery.min.js ./js",
+    "copy:handlebars": "cp ./node_modules/handlebars/dist/handlebars.min.js ./js",
     "copy:all": "npm run copy:bootstrap && npm run copy:jquery"
   },
   "repository": {
@@ -30,6 +31,7 @@
   "homepage": "https://github.com/gjthoman/pebble_auto_config#readme",
   "dependencies": {
     "bootstrap": "^3.3.6",
+    "handlebars": "^4.0.5",
     "jquery": "^2.2.4",
     "uncss": "^0.13.0"
   }

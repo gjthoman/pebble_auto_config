@@ -51,10 +51,12 @@ var PAC_core = (function PAC_core(){
 	var urlVars = {};
 	var configData = [];
 	var spectrumOptions = {};
+	var templates = {};
+	var $wrapper;
 		
 	function initSpectrumOptions(){
 		var colors = [];
-		var alphaNums = ['0','5','A','F']
+		var alphaNums = ['0','5','A','F'];
 		
 		for (var i = 0, len = alphaNums.length; i < len; i++) {
 		  var s = alphaNums[i];
@@ -81,27 +83,6 @@ var PAC_core = (function PAC_core(){
 		    palette: [arrays[1],arrays[3],arrays[5],arrays[7],arrays[0],arrays[2],arrays[4],arrays[6],arrays[8]]
 		};
 	}
-	
-	var create = {
-		panel: function(title, bodyContent) {
-			var $settings = $('#settings');
-		
-			var $panel = $('<div class="panel panel-default"></div>');
-			var $heading = $('<div class="panel-heading"><h3 class="panel-title">'+ title +'</h3></div>');
-			var $body = $('<div class="panel-body"></div>');
-
-			$body.append(bodyContent);
-			$panel.append($heading).append($body);
-			
-			$settings.append($panel);
-		},
-		label: function(_for, _text) {
-			return $('<label for="'+_for+'">'+_text+'</label>');
-		},
-		input: function(data) {
-			return $('<input class="'+data.klass+'" name="'+data.name+'" id="'+data.id+'" value="'+data.value+'" type="'+data.type+'" '+data.options+'></input>');
-		}
-	}
 
 	function checkProps(props, element) {
 		$.each(props, function(){
@@ -115,83 +96,94 @@ var PAC_core = (function PAC_core(){
 		color: 	["type","key","label","default"],
 		bool: 	["type","key","label","default"],
 		option: ["type","key","label","default","options"],
-		title: 	["type", "label"]
+		title: 	["type", "label"],
+		paragraph: ["content"]
 	}
 
-	var addInput = {
+	var addElement = {
 		title: function(value) {
 			$('#page_title').text(value.label);	
 		},
+		paragraph: function(element) {
+			$wrapper.append(templates.paragraph({
+				content: element.content
+			}));
+		},
+		section: function(element) {
+			$wrapper.append(templates.section({
+				label: element.label
+			}));
+		},
 		text: function(element){
-			var $input = create.input({
+			$wrapper.append(templates.input({
+				title: element.label,
 				id: element.key,
-				klass: "form-control",
 				type: "text",
 				value: element.default
-			});
+			}));
 
-			create.panel(element.label, $input);
 		},
 		number: function(element){
-			var $input = create.input({
+			$wrapper.append(templates.input({
+				title: element.label,
 				id: element.key,
-				klass: "form-control",
 				type: "number",
 				value: element.default
-			});
-
-			create.panel(element.label, $input);
+			}));
 		},
 		color: function(element){
-			var $input = create.input({
-				id: element.key,
+			$wrapper.append(templates.input({
+				title: element.label,
 				klass: "color",
+				id: element.key,
 				type: "text",
 				value: "#"+PAC_utils.numToHex(element.default)
-			});
-
-			create.panel(element.label, $input);
+			}));
 			$('#'+element.key).spectrum(spectrumOptions);
 		},
 		bool: function(element){
-			var $checkbox = $('<div></div>');
-			var $label = create.label(element.key, "");
-			var $input = create.input({
+			$wrapper.append(templates.bool({
+				title: element.label,
 				id: element.key,
-				type: "checkbox",
-				options: element.default == 1 ? "checked=checked" : ""
-			});
-			
-			
-			$checkbox.append($input);
-			$checkbox.append($label);
-
-			create.panel(element.label, $checkbox);
+				on: element.on,
+				off: element.off,
+				options: element.default == 1 ? "checked" : ""
+			}));
 		},
 		option: function(element){
-			var $radios = $('<div></div>');
+			var choices = [];
 
 			for (var i = 0, len = element.options.length; i < len; i++) {
 				var key = element.options[i].replace(/\W+/g, "_").toLowerCase();
-				var $label = create.label(key, element.options[i]);
-				var $input = create.input({
-					name: element.key,
-					id: key,
+				choices.push({
+					label: element.options[i],
+					key: element.key,
+					id: element.options[i].replace(/\W+/g, "_").toLowerCase(),
 					value: i,
-					type: "radio",
-					options: i == element.default ? "checked=checked" : ""
+					options: i == element.default ? "checked" : ""
 				});
-
-				$radios.append($input);
-				$radios.append($label);
 			}
 
-			create.panel(element.label, $radios);
+			$wrapper.append(templates.option({
+				title: element.label,
+				id: element.key,
+				options: choices
+			}));
 		}
 	}
 
 	function init(){
-		$('#settings').html('');
+		$wrapper = $('#settings');
+		$wrapper.html('');
+
+		templates = {
+			paragraph: Handlebars.compile($("#paragraph-template").html()),
+			section: Handlebars.compile($("#section-template").html()),
+			input: Handlebars.compile($("#panel_input-template").html()),
+			bool: Handlebars.compile($("#panel_bool-template").html()),
+			option: Handlebars.compile($("#panel_option-template").html())
+		}
+
 		spectrumOptions = initSpectrumOptions();
 		
 		configData = JSON.parse(PAC_utils.URLToObject().config);
@@ -203,7 +195,7 @@ var PAC_core = (function PAC_core(){
 	function createElements() {
 		$.each(configData, function(key, element){
 			checkProps(requiredFields[element.type],element);
-			addInput[element.type](element);
+			addElement[element.type](element);
 		});
 	}
 
@@ -254,8 +246,8 @@ var PAC_core = (function PAC_core(){
 	}
 
 	return {
-		init: init,
-		getValues: getValues
+		init: init//,
+		//getValues: getValues
 	}
 });
 

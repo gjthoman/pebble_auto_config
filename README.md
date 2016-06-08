@@ -1,14 +1,15 @@
 #Pebble Auto Configuration
-PAC is a simple configuration page for pebble watchface configuration.PAC uses url parameters to create a config page on the fly using JS.
+PAC is a simple configuration page for pebble watchface configuration. PAC uses url parameters to create a config page on the fly using JS. While it's not really automatic, it does cut down on boilerplate for a Pebble watchface.
 
-[URL Example](http://gjthoman.github.io/pebble_auto_config/?config=%5B%7B%22type%22%3A%22title%22%2C%22label%22%3A%22Corridor%20Config%22%7D%2C%7B%22type%22%3A%22option%22%2C%22key%22%3A%22batt_visibility%22%2C%22label%22%3A%22Battery%20Visibility%22%2C%22default%22%3A1%2C%22options%22%3A%5B%22Always%20Show%22%2C%22Never%20Show%22%2C%22Show%20on%20Shake%22%5D%7D%2C%7B%22type%22%3A%22text%22%2C%22key%22%3A%22pet_name%22%2C%22label%22%3A%22What%20is%20your%20pet%27s%20name%3F%22%2C%22default%22%3A%22Wicket%22%7D%2C%7B%22type%22%3A%22number%22%2C%22key%22%3A%22age%22%2C%22label%22%3A%22How%20old%20are%20you%3F%22%2C%22default%22%3A%2230%22%7D%2C%7B%22type%22%3A%22color%22%2C%22key%22%3A%22back_color%22%2C%22label%22%3A%22Background%20Color%22%2C%22default%22%3A16711680%7D%2C%7B%22type%22%3A%22color%22%2C%22key%22%3A%22hour_color%22%2C%22label%22%3A%22Hour%20Color%22%2C%22default%22%3A65280%7D%2C%7B%22type%22%3A%22bool%22%2C%22key%22%3A%22always_batt%22%2C%22label%22%3A%22Always%20Show%20Battery%22%2C%22default%22%3A1%7D%5D)
+[URL Example](http://gjthoman.github.io/pebble_auto_config/?config=%5B%7B%22type%22%3A%22title%22%2C%22label%22%3A%22Pebble%20Auto%20Config%22%7D%2C%7B%22type%22%3A%22paragraph%22%2C%22content%22%3A%22Lorem%20ipsum%20dolor%20sit%20amet%2C%20consectetur%20adipiscing%20elit.%20Aenean%20non%20nulla%20turpis.%20Fusce%20in%20imperdiet%20odio%2C%20vitae%20pulvinar%20arcu.%20Duis%20varius%20sem%20mi%2C%20sit%20amet%20euismod%20est%20hendrerit%20sagittis.%22%7D%2C%7B%22type%22%3A%22text%22%2C%22key%22%3A%22pet_name%22%2C%22label%22%3A%22Add%20Some%20Text%20Here%22%2C%22default%22%3A%22Wicket%22%7D%2C%7B%22type%22%3A%22number%22%2C%22key%22%3A%22age%22%2C%22label%22%3A%22This%20Field%20is%20Numeric%22%2C%22default%22%3A%2230%22%7D%2C%7B%22type%22%3A%22section%22%2C%22label%22%3A%22Section%20Title%22%7D%2C%7B%22type%22%3A%22bool%22%2C%22key%22%3A%22always_seconds%22%2C%22label%22%3A%22Show%20this%20BOOL%3F%22%2C%22on%22%3A%22Always%22%2C%22off%22%3A%22Never%22%2C%22default%22%3A1%7D%2C%7B%22type%22%3A%22option%22%2C%22key%22%3A%22batt_visibility%22%2C%22label%22%3A%22Battery%20Visibility%22%2C%22default%22%3A1%2C%22options%22%3A%5B%22Always%20Show%22%2C%22Never%20Show%22%2C%22Show%20on%20Shake%22%5D%7D%2C%7B%22type%22%3A%22color%22%2C%22key%22%3A%22hour_color%22%2C%22label%22%3A%22Hour%20Color%22%2C%22default%22%3A65280%7D%5D)
 
 ##General
 
-Pass in a `title` param to set page title
-
 **Supported Fields**
 
+* Title (page title)
+* Paragraph
+* Section
 * Text
 * Number
 * Color
@@ -19,14 +20,43 @@ Pass in a `title` param to set page title
 
 * `key`: should be alpha numeric (starting with alpha) and contain no spaces
 * `type`: one of [`"title"`,`"option"`,`"color"`,`"bool"`]
-* `label`: string
+* `label`, `content`, `on`, `off`: string
+* `options`: `["array", "of", "strings"]`
 * `default`: number or string. 0 or 1 for bool. colors are 16 bit integers
 
 ```javascript
 [	
 	{
 		type: "title",
-		label: "Corridor Config"
+		label: "Pebble Auto Config"
+	},
+	{
+		type: "section",
+		label: "Section Title"
+	},
+	{
+		type: "paragraph",
+		content: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean non nulla turpis. Fusce in imperdiet odio, vitae pulvinar arcu. Duis varius sem mi, sit amet euismod est hendrerit sagittis."
+	},
+	{
+		type: "text",
+		key: "pet_name",
+		label: "Add Some Text Here",
+		default: "Wicket"
+	},
+	{
+		type: "number",
+		key: "age",
+		label: "This Field is Numeric",
+		default: "30"
+	},
+	{
+		type: "bool",
+		key: "always_seconds",
+		label: "Show this BOOL?",
+		on: "Always",
+		off: "Never",
+		default: 1
 	},
 	{
 		type: "option",
@@ -36,34 +66,10 @@ Pass in a `title` param to set page title
 		options: [ "Always Show", "Never Show", "Show on Shake"]
 	},
 	{
-		type: "text",
-		key: "pet_name",
-		label: "What is your pet's name?",
-		default: "Wicket"
-	},
-	{
-		type: "number",
-		key: "age",
-		label: "How old are you?",
-		default: "30"
-	},
-	{
-		type: "color",
-		key: "back_color",
-		label: "Background Color",
-		default: 16711680
-	},
-	{
 		type: "color",
 		key: "hour_color",
 		label: "Hour Color",
 		default: 65280
-	},
-	{
-		type: "bool",
-		key: "always_batt",
-		label: "Always Show Battery",
-		default: 1
 	}
 ]
 ```
