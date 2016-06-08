@@ -14,7 +14,7 @@
     "copy:bootstrap": "cp ./node_modules/bootstrap/dist/css/bootstrap.min.css ./css",
     "copy:jquery": "cp ./node_modules/jquery/dist/jquery.min.js ./js",
     "copy:handlebars": "cp ./node_modules/handlebars/dist/handlebars.min.js ./js",
-    "copy:all": "npm run copy:bootstrap && npm run copy:jquery"
+    "copy:all": "npm run copy:bootstrap && npm run copy:jquery && npm run copy:handlebars"
   },
   "repository": {
     "type": "git",
