@@ -157,7 +157,7 @@ Pebble.addEventListener('webviewclosed', function(e) {
 
 ```
 
-###Partial *.c example (simple):
+###Reading appMessages *.c example (simple):
 
 ```c
 static GColor background_color;
