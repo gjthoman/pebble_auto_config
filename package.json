@@ -1,6 +1,6 @@
 {
   "name": "pebble_auto_config",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "PAC is a simple configuration page for pebble watchface configuration. PAC uses url parameters to create a config page on the fly using JS.",
   "main": "index.js",
   "scripts": {
@@ -14,7 +14,8 @@
     "copy:bootstrap": "cp ./node_modules/bootstrap/dist/css/bootstrap.min.css ./css",
     "copy:jquery": "cp ./node_modules/jquery/dist/jquery.min.js ./js",
     "copy:handlebars": "cp ./node_modules/handlebars/dist/handlebars.min.js ./js",
-    "copy:all": "npm run copy:bootstrap && npm run copy:jquery && npm run copy:handlebars"
+    "copy:all": "npm run copy:bootstrap && npm run copy:jquery && npm run copy:handlebars",
+    "postversion": "touch ./test-$npm_package_version.html"
   },
   "repository": {
     "type": "git",
