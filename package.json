@@ -1,6 +1,6 @@
 {
   "name": "pebble_auto_config",
-  "version": "0.1.1",
+  "version": "0.1.10",
   "description": "PAC is a simple configuration page for pebble watchface configuration. PAC uses url parameters to create a config page on the fly using JS.",
   "main": "index.js",
   "scripts": {
@@ -9,13 +9,16 @@
     "package:js": "npm run combine:js",
     "uncss": "uncss ./index.html > ./main.min.css",
     "combine:css": "cat ./css/*.css >> ./main.css",
-    "combine:js": "rm ./main.js && cat ./js/*.js >> ./main.js",
+    "combine:js": "cat ./js/*.js >> ./main.js",
     "copy:css": "cp main.min.css main.css",
     "copy:bootstrap": "cp ./node_modules/bootstrap/dist/css/bootstrap.min.css ./css",
     "copy:jquery": "cp ./node_modules/jquery/dist/jquery.min.js ./js",
     "copy:handlebars": "cp ./node_modules/handlebars/dist/handlebars.min.js ./js",
     "copy:all": "npm run copy:bootstrap && npm run copy:jquery && npm run copy:handlebars",
-    "postversion": "touch ./test-$npm_package_version.html"
+    "copy:dist": "cp ./main.css dist/$npm_package_version && cp ./main.css dist/$npm_package_version && cp ./_index.html dist/$npm_package_version/index.html",
+    "postversion": "npm run package && npm run replace:markup && mkdir ./dist/$npm_package_version && npm run copy:dist && cp ./main.css dist/$npm_package_version && cp ./main.js dist/$npm_package_version && cp ./_index.html dist/$npm_package_version/index.html && npm run cleanup:files",
+    "replace:markup": "webpack replace-webpack-plugin _index.html",
+    "cleanup:files": "rm main.css main.js main.min.css _index.html"
   },
   "repository": {
     "type": "git",
@@ -35,5 +38,14 @@
     "handlebars": "^4.0.5",
     "jquery": "^2.2.4",
     "uncss": "^0.13.0"
+  },
+  "devDependencies": {
+    "fs": "0.0.2",
+    "i": "^0.3.5",
+    "npm": "^3.9.5",
+    "replace-webpack-plugin": "^0.1.2",
+    "version": "^0.1.2",
+    "webpack": "^1.13.1",
+    "webpack-load-plugins": "^0.1.2"
   }
 }
