@@ -230,7 +230,7 @@ var PAC_core = (function PAC_core(){
 		},
 		option: function(key) {
 			var input = document.getElementById(key);
-			return $('input[name="' + key + '"]:checked').val();
+			return parseInt( $('input[name="' + key + '"]:checked').val());
 		}
 	}
 
