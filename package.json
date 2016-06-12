@@ -1,6 +1,6 @@
 {
   "name": "pebble_auto_config",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "PAC is a simple configuration page for pebble watchface configuration. PAC uses url parameters to create a config page on the fly using JS.",
   "main": "index.js",
   "scripts": {
