@@ -132,8 +132,8 @@
           </div>
           <div class="panel-body">
             {{#each options}}
-              <input class="undefined" name="{{key}}" id="{{id}}" value="{{value}}" type="radio" {{options}}>
-              <label for="{{id}}">{{label}}</label>
+              <input class="undefined" name="{{key}}" id="{{key}}{{id}}" value="{{value}}" type="radio" {{options}}>
+              <label for="{{key}}{{id}}">{{label}}</label>
             {{/each}}
           </div>
         </div>   
