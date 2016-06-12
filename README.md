@@ -2,7 +2,7 @@
 git subtree push --prefix dist origin gh-pages
 -->
 #Pebble Auto Configuration
-PAC is a simple configuration page for pebble watchface configuration. Simply build a JSON object and PAC will create a config page on the fly using JS. While it's not really automatic, it does cut down on boilerplate for a Pebble watchface.
+PAC is a simple configuration page for pebble watchface configuration. Build a JSON object and PAC will create a config page on the fly using javascript. While it's not really automatic, it does cut down on boilerplate for a Pebble watchface.
 
 Current Version URL: `http://gjthoman.github.io/pebble_auto_config/1.0.0?config=[URL ENCODED SERIALIZED JSON]`
 
@@ -13,13 +13,14 @@ Current Version URL: `http://gjthoman.github.io/pebble_auto_config/1.0.0?config=
 **Supported Fields**
 
 * Title (page title)
-* Paragraph
-* Section
-* Text
-* Number
-* Color
-* Bool
-* Option
+* Paragraph (content)
+* Section (content)
+* Inputs
+	* Text
+	* Number
+	* Color
+	* Bool
+	* Option
  
 ##JSON configuration
 
@@ -81,7 +82,7 @@ Current Version URL: `http://gjthoman.github.io/pebble_auto_config/1.0.0?config=
 
 ##How to use PAC with Pebble App Messaging
 
-Basic usage complete with local storage example.
+Basic usage with local storage example.
 
 ###SETTINGS Message keys:
 
@@ -92,7 +93,7 @@ AppKeyMinuteColor = 2,
 AppKeyShowBatt = 3
 ```
 
-###Full app.js example:
+###Full app.js (on Pebble) example:
 
 ```javascript
 Pebble.addEventListener('showConfiguration', function() {
